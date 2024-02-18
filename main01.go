@@ -4,10 +4,9 @@ import (
     "fmt"
     "time"
     "strconv"
-	"net/http"
+    "net/http"
     "strings"
-	"sync"
-    //"os"
+    "sync"
 )
 
 type Operation struct {
@@ -36,13 +35,10 @@ var mu sync.Mutex
 func MainHandler(w http.ResponseWriter, r *http.Request) {
     st := r.URL.Query().Get("nm")
     st = strings.ReplaceAll(st, string(rune(32)), "+")
-    fmt.Fprintln(w, st)
     
     id := len(Information)
     Information = append(Information, Info{st, false, nil, TimePlus, TimeMinus, TimeMult, TimeDivis, id, 0, 0, fmt.Errorf("200")})
-    //value, timeProcess, err := 
-    fmt.Fprintln(w, id, len(Information))
-    //go CountProcess(&Information[id])
+    fmt.Fprintln(w, id)
     mu.Lock()
     ch = append(ch, id)
     mu.Unlock()
@@ -89,18 +85,11 @@ func DataHandler(w http.ResponseWriter, r *http.Request) {
     for i := range Information {
         fmt.Fprintf(w, "ID: %d Value: %f Code: %s ProcessTime: %s String: %s\n", Information[i].ID, Information[i].Value, Information[i].Error, Information[i].ProcessTime,Information[i].CountStr)
     }  
-    mu.Lock()
-    fmt.Fprintln(w,ch)
-    mu.Unlock()
  }
 
 func Meine(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//start := time.Now()
-
 		next.ServeHTTP(w, r)
-
-		//duration := time.Since(start)
 	})
  }
 
@@ -109,13 +98,6 @@ func main() {
     TimeMinus = time.Second
     TimeDivis = time.Second
     TimeMult = time.Second
-    /*file_path := "C:\\Users\\aleks\\codeing\\go\\code\\ЯндексЛицей\\2\\финальная_задача\\data.txt"
-    _, err := os.ReadFile(file_path)
-    if err != nil {
-        fmt.Println(err)
-    } else {
-        fmt.Println("ok")
-    }*/
     Information = make([]Info, 0)
     ch = make([]int, 0)
 
@@ -242,7 +224,6 @@ func CountProcess(inf *Info) (float64, time.Duration, error){
     }
     inf.ProcessTime = time.Now().Sub(t0)
     inf.Value = ls[0].Value
-    //fmt.Println(ls)
     return inf.Value, inf.ProcessTime, nil
 }
 
@@ -282,9 +263,6 @@ func nInDegree(a, b int) int {
     }
     return p 
  }
-
-
-
 
 
 /*
